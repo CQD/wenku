@@ -1,0 +1,19 @@
+{
+    "outfile": "關於我轉生變成史萊姆這檔事-05",
+    "titleParams": {
+        "title": "關於我轉生變成史萊姆這檔事 (5)",
+        "author": "伏瀬",
+        "rights": "Property",
+        "language": "zh-TW"
+    },
+    "urls":[
+        "https://www.wenku8.net/novel/1/1787/67374.htm",
+        "https://www.wenku8.net/novel/1/1787/67375.htm",
+        "https://www.wenku8.net/novel/1/1787/67376.htm",
+        "https://www.wenku8.net/novel/1/1787/67407.htm",
+        "https://www.wenku8.net/novel/1/1787/67560.htm",
+        "https://www.wenku8.net/novel/1/1787/67784.htm",
+        "https://www.wenku8.net/novel/1/1787/67826.htm"
+    ],
+    "cover": "./build/cover.jpg"
+}

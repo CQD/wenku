@@ -35,7 +35,7 @@ async function main() {
 
 async function url2Markdown(url, idx) {
     console.log(`正在撈取 ${url}`);
-    idx++;
+    idx++; // 0 based 轉換成 1 based
 
     // 抓 html
     let html = await fetchHtml(url);
@@ -51,7 +51,7 @@ async function url2Markdown(url, idx) {
     })
 
     content = content.textContent.replace(/\u00a0/g, "").trim();
-    content = `# ${title}\n\n${content}\n`;
+    content = `# ${title} {#ch${idx}}\n\n${content}\n`;
 
     // 存檔
     let filename = `${idx}.md`.padStart(6, '0');
@@ -59,13 +59,13 @@ async function url2Markdown(url, idx) {
 
     // 收尾
     console.log(`已儲存 ${filename}，標題：${title}`);
-    return {filename: filename, title: title};
+    return {filename: filename, title: title, idx: idx};
 }
 
 async function makeSummary(files){
-    let text = "## 目錄\n\n";
+    let text = "## 目錄 {epub:type=index}\n\n";
     files.forEach(file => {
-        text += `* [${file['title']}](${file['filename']})\n`
+        text += `* [${file['title']}](#ch${file['idx']})\n`
     });
 
     let p1 = text2File(`${BASEDIR}/SUMMARY.md`, text);

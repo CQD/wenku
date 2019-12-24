@@ -96,7 +96,7 @@ async function makeEpub(files){
     let docs = ['title.yaml', 'SUMMARY.md'];
     files.forEach(file => docs.push(file.filename));
 
-    let cmd = `pandoc -t epub3 --css style/main.css --epub-cover-image ${CONFIG.cover}  -o ${BASEDIR}/${CONFIG.outfile}.epub ${BASEDIR}/${docs.join(` ${BASEDIR}/`)}`;
+    let cmd = `pandoc -t epub3 --css style/main.css --epub-cover-image ${CONFIG.cover}  -o '${BASEDIR}/${CONFIG.outfile}.epub' ${BASEDIR}/${docs.join(` ${BASEDIR}/`)}`;
     console.log(cmd);
 
     return exec(cmd);

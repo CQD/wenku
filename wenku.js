@@ -50,7 +50,10 @@ async function url2Markdown(url, idx) {
         content.removeChild(e);
     })
 
-    content = content.textContent.replace(/\u00a0/g, "").trim();
+    content = content.textContent
+        .replace(/\u00a0/g, "")
+        .replace(/^[*●]+$/gm, "----")
+        .trim();
     content = `# ${title} {#ch${idx}}\n\n${content}\n`;
 
     // 存檔

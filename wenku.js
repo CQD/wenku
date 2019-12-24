@@ -13,6 +13,7 @@ if (process.argv.length < 3) {
 const CONFIG = JSON.parse(fs.readFileSync( process.argv[2] ));
 const BASEDIR = './build';
 
+CONFIG.removeExtra = [];
 
 main();
 
@@ -21,6 +22,12 @@ main();
 async function main() {
     fs.existsSync(BASEDIR) || fs.mkdirSync(BASEDIR);
 
+    if (CONFIG.cover.match(/https?:\/\//)) {
+        let coverLocalPath = `${BASEDIR}/tmpcover.jpg`;
+        await exec(`curl -s ${CONFIG.cover} > ${coverLocalPath}`);
+        CONFIG.cover = coverLocalPath;
+        CONFIG.removeExtra.push('tmpcover.jpg');
+    }
 
     let jobs = CONFIG.urls.map(url2Markdown);
     let files = await Promise.all(jobs);
@@ -88,6 +95,8 @@ async function removeTmpFiles(files){
     files = files.map(file => file.filename);
     files.push('SUMMARY.md');
     files.push('title.yaml');
+
+    CONFIG.removeExtra.forEach(f => files.push(f));
 
     return exec(`rm ${BASEDIR}/${files.join(` ${BASEDIR}/`)}`);
 }

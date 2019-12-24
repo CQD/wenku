@@ -41,11 +41,11 @@ async function url2Markdown(url, idx) {
     let html = await fetchHtml(url);
 
     // 解析 HTML，轉換成像是 markdown 的東西
-    let dom = new JSDOM(html);
+    let { document } = new JSDOM(html).window;
 
-    let title = dom.window.document.querySelector('#title').textContent || "第 ${idx} 章";
+    let title = document.querySelector('#title').textContent || "第 ${idx} 章";
 
-    let content = dom.window.document.querySelector('#content');
+    let content = document.querySelector('#content');
     content.querySelectorAll('#contentdp').forEach(e => {
         content.removeChild(e);
     })

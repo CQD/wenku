@@ -27,6 +27,7 @@ async function main() {
 
     await makeSummary(files);
     await makeEpub(files);
+    await removeTmpFiles(files);
 
     console.log('完成');
 }
@@ -81,6 +82,14 @@ async function makeSummary(files){
     let p2 = text2File(`${BASEDIR}/title.yaml`, text);
 
     return Promise.all([p1, p2]);
+}
+
+async function removeTmpFiles(files){
+    files = files.map(file => file.filename);
+    files.push('SUMMARY.md');
+    files.push('title.yaml');
+
+    return exec(`rm ${BASEDIR}/${files.join(` ${BASEDIR}/`)}`);
 }
 
 async function makeEpub(files){

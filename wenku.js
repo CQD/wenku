@@ -139,3 +139,11 @@ async function exec(cmd) {
         });
     });
 }
+
+var escapeDocument;
+function escapeHtml(dirtyText){
+    escapeDocument = escapeDocument || new JSDOM().window.document;
+    let p = escapeDocument.createElement('p');
+    p.textContent = dirtyText;
+    return p.innerHTML;
+}

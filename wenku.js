@@ -82,8 +82,8 @@ async function makeSummary(files){
     let p1 = text2File(`${BASEDIR}/SUMMARY.md`, text);
 
     text = "---\n";
-    for (let field in CONFIG.titleParams) {
-        text += `${field}: ${CONFIG.titleParams[field]}\n`;
+    for (let field in CONFIG.metadata) {
+        text += `${field}: ${CONFIG.metadata[field]}\n`;
     }
     text += "...\n"
     let p2 = text2File(`${BASEDIR}/title.yaml`, text);

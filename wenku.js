@@ -22,7 +22,7 @@ main();
 async function main() {
     fs.existsSync(BASEDIR) || fs.mkdirSync(BASEDIR);
 
-    if (CONFIG.cover.match(/https?:\/\//)) {
+    if (CONFIG.cover && CONFIG.cover.match(/https?:\/\//)) {
         let coverLocalPath = `${BASEDIR}/tmpcover.jpg`;
         await exec(`curl -s ${CONFIG.cover} > ${coverLocalPath}`);
         CONFIG.cover = coverLocalPath;
@@ -105,7 +105,16 @@ async function makeEpub(files){
     let docs = ['title.yaml', 'SUMMARY.md'];
     files.forEach(file => docs.push(file.filename));
 
-    let cmd = `pandoc -t epub3 --css style/main.css --epub-cover-image ${CONFIG.cover}  -o '${BASEDIR}/${CONFIG.outfile}.epub' ${BASEDIR}/${docs.join(` ${BASEDIR}/`)}`;
+    let params = [
+        '-t epub3',
+        '--css style/main.css',
+        `-o ${BASEDIR}/${CONFIG.outfile}.epub`,
+    ];
+    if (CONFIG.cover) {
+        params.push(`--epub-cover-image ${CONFIG.cover}`);
+    }
+
+    let cmd = `pandoc ${params.join(' ')} ${BASEDIR}/${docs.join(` ${BASEDIR}/`)}`;
     console.log(cmd);
 
     return exec(cmd);

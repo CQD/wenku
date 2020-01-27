@@ -108,7 +108,7 @@ async function makeEpub(files){
     let params = [
         '-t epub3',
         '--css style/main.css',
-        `-o ${BASEDIR}/${CONFIG.outfile}.epub`,
+        `-o "${BASEDIR}/${CONFIG.outfile}.epub"`,
     ];
     if (CONFIG.cover) {
         params.push(`--epub-cover-image ${CONFIG.cover}`);

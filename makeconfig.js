@@ -56,7 +56,7 @@ async function main() {
                 break;
             case "ccss":
                 let a = td.querySelector('a');
-                let href = `${bookBasePath}/${a.href}`;
+                let href = (0 === a.href.indexOf('http')) ? a.href : `${bookBasePath}/${a.href}`;
                 if ('插圖' === a.textContent) {
                     book.cover = await extractCover(href);
                 } else {

@@ -29,8 +29,11 @@ async function main() {
         CONFIG.removeExtra.push('tmpcover.jpg');
     }
 
-    let jobs = CONFIG.urls.map(url2Markdown);
-    let files = await Promise.all(jobs);
+    const files = [];
+    for (const idx in CONFIG.urls) {
+        files.push(await url2Markdown(CONFIG.urls[idx], idx));
+        await sleep(1500);
+    }
 
     await makeSummary(files);
     await makeEpub(files);
@@ -51,7 +54,7 @@ async function url2Markdown(url, idx) {
     // 解析 HTML，轉換成像是 markdown 的東西
     let { document } = new JSDOM(html).window;
 
-    let title = document.querySelector('#title').textContent || "第 ${idx} 章";
+    let title = document.querySelector('#title').textContent || `第 ${idx} 章`;
 
     let content = document.querySelector('#content');
     content.querySelectorAll('#contentdp').forEach(e => {
@@ -121,7 +124,7 @@ async function makeEpub(files){
 }
 
 async function fetchHtml(url) {
-    return exec(`curl -s '${url}' | iconv -f GB18030 | opencc`);
+    return await exec(`curl -s '${url}' | iconv -f GB18030 | opencc`);
 }
 
 async function text2File(filename, content) {
@@ -155,4 +158,10 @@ function escapeHtml(dirtyText){
     let p = escapeDocument.createElement('p');
     p.textContent = dirtyText;
     return p.innerHTML;
+}
+
+async function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }

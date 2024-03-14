@@ -84,7 +84,7 @@ async function makeConfig(book, urls){
     };
 
     let configFile = `${BASEDIR}/${config.outfile}.json`;
-    await text2File(`${configFile}`, JSON.stringify(config));
+    await text2File(`${configFile}`, JSON.stringify(config, null, 2));
     console.log(`已寫入 ${configFile}`)
 }
 

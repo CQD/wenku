@@ -32,7 +32,7 @@ async function main() {
     const files = [];
     for (const idx in CONFIG.urls) {
         files.push(await url2Markdown(CONFIG.urls[idx], idx));
-        await sleep(1500);
+        await sleep(2500);
     }
 
     await makeSummary(files);

@@ -1,0 +1,22 @@
+/* 中文直書（垂直排版、由右至左閱讀）樣式 */
+/* 當 config 設定 "vertical": true 或加上 --vertical 參數時， */
+/* wenku.js 會在 main.css 之後額外套用本檔，用以覆蓋橫書設定。 */
+
+html {
+    /* 相容各家閱讀器：EPUB 舊前綴、WebKit（Apple Books）、標準屬性 */
+    -epub-writing-mode: vertical-rl;
+    -webkit-writing-mode: vertical-rl;
+    writing-mode: vertical-rl;
+}
+
+body {
+    /* 直書時行距略為加大較易閱讀 */
+    line-height: 1.75;
+}
+
+/* main.css 以 margin-top 讓 h1 留白（橫書用）；
+   直書時起始側在右方，改用 margin-right 留白。 */
+h1 {
+    margin-top: 0;
+    margin-right: 10%;
+}

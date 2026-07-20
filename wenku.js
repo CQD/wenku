@@ -5,13 +5,25 @@ const realexec = require("child_process").exec;
 const fs = require("fs");
 const process = require('process');
 
-if (process.argv.length < 3) {
-    console.log("用法：wenku.js {config.json}");
+const args = process.argv.slice(2);
+const configPath = args.find(a => !a.startsWith('--'));
+
+if (!configPath) {
+    console.log("用法：wenku.js {config.json} [--vertical|--horizontal]");
     return;
 }
 
-const CONFIG = JSON.parse(fs.readFileSync( process.argv[2] ));
+const CONFIG = JSON.parse(fs.readFileSync( configPath ));
 const BASEDIR = './build';
+
+// 排版方向：直書（垂直排版、右到左閱讀）或橫書（水平排版、左到右閱讀）
+// 優先序：CLI 參數 > config.vertical > 預設橫書
+if (args.includes('--vertical')) {
+    CONFIG.vertical = true;
+} else if (args.includes('--horizontal')) {
+    CONFIG.vertical = false;
+}
+CONFIG.vertical = !!CONFIG.vertical;
 
 CONFIG.removeExtra = [];
 
@@ -108,16 +120,29 @@ async function makeEpub(files){
     let docs = ['title.yaml', 'SUMMARY.md'];
     files.forEach(file => docs.push(file.filename));
 
+    let cssFiles = ['style/main.css'];
     let params = [
         '-t epub3',
-        '--css style/main.css',
         `-o "${BASEDIR}/${CONFIG.outfile}.epub"`,
     ];
+
+    if (CONFIG.vertical) {
+        // 直書：文字垂直排版 + 右到左翻頁
+        cssFiles.push('style/vertical.css');
+        params.push('-M page-progression-direction=rtl');
+    } else {
+        // 橫書：文字水平排版 + 左到右翻頁
+        params.push('-M page-progression-direction=ltr');
+    }
+
+    cssFiles.forEach(css => params.push(`--css ${css}`));
+
     if (CONFIG.cover) {
         params.push(`--epub-cover-image ${CONFIG.cover}`);
     }
 
     let cmd = `pandoc ${params.join(' ')} ${BASEDIR}/${docs.join(` ${BASEDIR}/`)}`;
+    console.log(`排版方向：${CONFIG.vertical ? '直書（垂直排版、右到左閱讀）' : '橫書（水平排版、左到右閱讀）'}`);
     console.log(cmd);
 
     return exec(cmd);

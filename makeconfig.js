@@ -73,6 +73,7 @@ async function main() {
 async function makeConfig(book, urls){
     let config = {
         "outfile": `${book.title}-${book.volumnTitle}`,
+        "vertical": false,
         "metadata":{
             "title": `${book.title} ${book.volumnTitle}`,
             "author": book.author,

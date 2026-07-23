@@ -11,7 +11,7 @@ html {
 
 body {
     /* 直書時行距略為加大較易閱讀 */
-    line-height: 1.75;
+    line-height: 1.5;
 }
 
 /* main.css 以 margin-top 讓 h1 留白（橫書用）；

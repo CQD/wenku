@@ -71,11 +71,13 @@ async function main() {
 }
 
 async function makeConfig(book, urls){
+    let volumn = normalizeVolumnTitle(book.volumnTitle);
+
     let config = {
-        "outfile": `${book.title}-${book.volumnTitle}`,
+        "outfile": `${book.title}-${volumn}`,
         "vertical": false,
         "metadata":{
-            "title": `${book.title} ${book.volumnTitle}`,
+            "title": `${book.title} ${volumn}`,
             "author": book.author,
             "language": 'zh-tw',
             "subject": book.subject,
@@ -87,6 +89,43 @@ async function makeConfig(book, urls){
     let configFile = `${BASEDIR}/${config.outfile}.json`;
     await text2File(`${configFile}`, JSON.stringify(config, null, 2));
     console.log(`已寫入 ${configFile}`)
+}
+
+// 「第一卷」→「01」、「第十二卷」→「12」
+// 中文數字用字串排序會亂掉（十一卷排在二卷前面），所以轉成補零的阿拉伯數字
+// 卷名有多餘文字時只換掉數字部分，例如「第一卷 序章篇」→「01 序章篇」
+// 認不出數字的卷名（例如「短篇集」）維持原樣
+function normalizeVolumnTitle(volumnTitle){
+    return volumnTitle
+        .replace(/第\s*([零〇一二三四五六七八九十百千兩\d]+)\s*[卷部冊集]/, (match, num) => {
+            let n = cn2int(num);
+            return (null === n) ? match : String(n).padStart(2, '0');
+        })
+        .trim();
+}
+
+// 中文數字轉阿拉伯數字，支援到千位；認不出來時回傳 null
+function cn2int(text){
+    const DIGITS = {'零':0, '〇':0, '一':1, '二':2, '兩':2, '三':3, '四':4, '五':5, '六':6, '七':7, '八':8, '九':9};
+    const UNITS = {'十':10, '百':100, '千':1000};
+
+    if (/^\d+$/.test(text)) return parseInt(text, 10);
+
+    let total = 0;
+    let current = 0;
+    for (let char of text) {
+        if (char in DIGITS) {
+            current = DIGITS[char];
+        } else if (char in UNITS) {
+            // 「十二」的十前面沒數字，視為一
+            total += (current || 1) * UNITS[char];
+            current = 0;
+        } else {
+            return null;
+        }
+    }
+
+    return total + current;
 }
 
 async function extractCover(href){

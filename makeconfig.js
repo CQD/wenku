@@ -12,6 +12,13 @@ if (process.argv.length < 3) {
 
 const BASEDIR = './build';
 
+// 連續請求的最小間隔。太快會被 Cloudflare 流量限制擋下（回應是「error code: 1015」）
+const FETCH_INTERVAL = 2500;
+// 被擋下時的重試次數，每次等待時間加倍
+const FETCH_RETRY = 4;
+
+let lastFetchAt = 0;
+
 main();
 
 ////////////////////////////////////////////////////////
@@ -133,15 +140,46 @@ async function extractCover(href){
     let html = await url2html(href);
     let { document } = new JSDOM(html).window;
     let link = document.querySelector('.divimage a');
-    return link ? link.href : null;
+    if (!link) {
+        console.log(` - 警告：${href} 找不到插圖，這一卷不會有封面`);
+        return null;
+    }
+    return link.href;
 }
 
 
 ////////////////////////////////////////////////////////
 
 async function url2html(url){
-    console.log(` - fetching ${url}`);
-    return exec(`curl -s '${url}' | iconv -f GB18030 | opencc`);
+    for (let attempt = 1; ; attempt++) {
+        // 距離上次請求不到 FETCH_INTERVAL 就先等，避免整份書目一次連發被擋
+        let idle = lastFetchAt + FETCH_INTERVAL - Date.now();
+        if (idle > 0) await sleep(idle);
+
+        console.log(` - fetching ${url}`);
+        let html = await exec(`curl -s '${url}' | iconv -f GB18030 | opencc`);
+        lastFetchAt = Date.now();
+
+        if (!isRateLimited(html)) return html;
+
+        if (attempt >= FETCH_RETRY) {
+            throw new Error(`${url} 連續 ${FETCH_RETRY} 次被流量限制擋下：${html.trim()}`);
+        }
+
+        let wait = FETCH_INTERVAL * Math.pow(2, attempt);
+        console.log(` - 被流量限制擋下（${html.trim()}），等 ${wait / 1000} 秒後重試`);
+        await sleep(wait);
+    }
+}
+
+// Cloudflare 擋下時 HTTP 狀態仍然是 200，內文只有「error code: 1015」，
+// 不特別檢查就會被當成正常頁面解析，然後靜默抓不到封面
+function isRateLimited(html){
+    return /^\s*error code: \d+\s*$/.test(html);
+}
+
+async function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 async function text2File(filename, content) {

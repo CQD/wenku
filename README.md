@@ -34,14 +34,14 @@ $ for file in build/*.json; do ./wenku.js "$file"; done
 
 ## 排版方向（直書／橫書）
 
-可控制產生的 epub 是**中文直書**（垂直排版、由右至左翻頁）還是**橫書**（水平排版、由左至右翻頁），預設為橫書。
+可控制產生的 epub 是**中文直書**（垂直排版、由右至左翻頁）還是**橫書**（水平排版、由左至右翻頁），預設為直書。
 
 透過 config 的 `vertical` 欄位設定：
 
 ```json
 {
   "outfile": "...",
-  "vertical": true,   // true = 直書；false 或省略 = 橫書
+  "vertical": true,   // true 或省略 = 直書；false = 橫書
   "metadata": { ... }
 }
 ```

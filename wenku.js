@@ -17,11 +17,13 @@ const CONFIG = JSON.parse(fs.readFileSync( configPath ));
 const BASEDIR = './build';
 
 // 排版方向：直書（垂直排版、右到左閱讀）或橫書（水平排版、左到右閱讀）
-// 優先序：CLI 參數 > config.vertical > 預設橫書
+// 優先序：CLI 參數 > config.vertical > 預設直書
 if (args.includes('--vertical')) {
     CONFIG.vertical = true;
 } else if (args.includes('--horizontal')) {
     CONFIG.vertical = false;
+} else if (undefined === CONFIG.vertical) {
+    CONFIG.vertical = true;
 }
 CONFIG.vertical = !!CONFIG.vertical;
 
